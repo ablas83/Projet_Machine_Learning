@@ -7,7 +7,7 @@ def intro():
         layout="centered",
         initial_sidebar_state="auto"
     )
-dataset = None
+df = None
 def header():
     st.title('Bienvenue')
     

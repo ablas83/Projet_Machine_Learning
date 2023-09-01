@@ -19,19 +19,12 @@ df = pd.DataFrame(data)
 # Afficher les premières lignes du DataFrame
 print(df.head())
 
-
-
-X = df.iloc[:, :-1].values #prend toutes les colonnes à part la dernière
-y = df.iloc[:,-1].values #prend les valeurs de la dernière colonne
-print(X)
-print(y)
-
 # POO
 class DataPreprocessor:
     def __init__(self, df, X, y):
         self.df = df
-        self.X = X
-        self.y = y
+        self.X =df.iloc[:, :-1].values
+        self.y = df['Target']
     
     def missing_values(self, strategy='mean'):
         imputer = SimpleImputer(strategy=strategy)
