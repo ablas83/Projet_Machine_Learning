@@ -1,38 +1,46 @@
 import streamlit as st
 from Utils.bdd import connection_database, get_data_to_df
-
+from helpers.selection import getAlgorims
+df = None
+table =  None
 def intro():
     return st.set_page_config(
         page_title="ML Playground",
         layout="centered",
         initial_sidebar_state="auto"
     )
-df = None
+
 def header():
     st.title('Bienvenue')
-    
+    table = st.table(getData(st.session_state['data_sb'],None).head())
 
 def sidebar():
+    st.sidebar.selectbox('please select your dataset', options= ['Diabet inde','Vin'], key ='data_sb', on_change=changeData)
+    st.sidebar.file_uploader("Choose a file", type=['csv'], key='uploaded_file',on_change= load)
     
-    sellection=st.sidebar.selectbox('please select your dataset', options= ['Diabet inde','Vin', 'load csv file'], key ='data_sb', on_change=changeData)
+    algorithms = getAlgorims(df)
+    st.sidebar.selectbox('please select your algorithm', options= algorithms[:][0], key ='algo', on_change=changeAlgo)
 
+def changeAlgo():
+    pass
 def changeData():
-    uploaded_file = None
-    if st.session_state['data_sb'] == 'load csv file':
-        uploaded_file = st.sidebar.file_uploader("Choose a file", type=['csv'], key='uploaded_file',on_change= load)
-    else:
-        db = connection_database()
-        df = get_data_to_df(st.session_state['data_sb'],db,None)
-        dataset = st.table(df.head())
+    pass
+        
 def load():
-    if st.session_state['uploaded_file'] is not None:
-        db = connection_database()
-        df = get_data_to_df(st.session_state['data_sb'],db,st.session_state['uploaded_file'])
-        dataset = st.table(df.head())
-    else:
-        dataset = st.caption('none')
+   pass
+
+def getData(type, path):
+    db = connection_database()
+    return get_data_to_df(type,db,path)
 
 if __name__ == '__main__':
     intro()
-    header()
     sidebar()
+    st.title('Bienvenue')
+    if st.session_state['uploaded_file'] is not None:
+        df = getData('load file',st.session_state['uploaded_file'])
+        table = st.table(df.head())
+    else :
+        df = getData(st.session_state['data_sb'],None)
+        table = st.table(df.head())
+    
