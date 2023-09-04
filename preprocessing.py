@@ -4,14 +4,15 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.ensemble import IsolationForest
 from sklearn.model_selection import train_test_split
-import Utils.bdd
+from sklearn import set_config
+set_config(transform_output="pandas")
 
-df = Utils.bdd.get_data_to_df()
+
 
 
 class DataPreprocessor:
     def __init__(self, df):
-        self.df = df
+        self.df = pd.DataFrame(df)
         self.X = None
         self.y = None
         self.X_train = None
@@ -42,6 +43,10 @@ class DataPreprocessor:
                     self.df[column].fillna(self.df[column].mode().iloc[0], inplace=True)
     
         return self.df
+    
+    def drop_id(self):
+        self.df = self.df.drop("id",axis=1)
+        return self.df
 
     def label_encoder(self):
         labelencoder = LabelEncoder()
@@ -59,26 +64,34 @@ class DataPreprocessor:
 
     def standardisation(self):
         scaler = StandardScaler()
-        self.df = scaler.fit_transform(self.df)
+        df1 = self.df
+        # for column in self.df.columns:
+        #     if column != "target":
+        #         self.df[column] = scaler.fit_transform(self.df[column])
+        self.y = self.df['target']
+        self.df = scaler.fit_transform(self.df.drop('target', axis=1))
+        #self.df = pd.DataFrame(self.df,columns=df1.columns)
         return self.df
          
     def split_data(self):
-        self.X = df.drop('target', axis = 1)
-        self.y = df['target']
+        #self.y = self.df['target']
+        self.X = self.df
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size = 0.3,random_state = 42)
         return (self.X_train, self.X_test, self.y_train, self.y_test)
     
     def preprocess_data(self):
         self.missing_values()
+        self.drop_id()
         self.label_encoder()
         self.outliers()
         self.standardisation()
+        print(self.y)
         return self.split_data()
 
 # Créer une instance du préprocesseur de données
-preprocessor = DataPreprocessor(df)
-preprocessor.preprocess_data()
-X_train, X_test, y_train, y_test = (
-    preprocessor.X_train, preprocessor.X_test, preprocessor.y_train, preprocessor.y_test
-)
+# preprocessor = DataPreprocessor(df)
+# preprocessor.preprocess_data()
+# X_train, X_test, y_train, y_test = (
+#     preprocessor.X_train, preprocessor.X_test, preprocessor.y_train, preprocessor.y_test
+# )
 #print(y_test)

@@ -1,6 +1,7 @@
 import streamlit as st
 from Utils.bdd import connection_database, get_data_to_df
 from helpers.selection import getAlgorims
+from Utils.train_test import train_test
 df = None
 table =  None
 def intro():
@@ -46,4 +47,9 @@ if __name__ == '__main__':
         algorithms = getAlgorims(df)
         st.sidebar.selectbox('please select your algorithm', options= algorithms.keys(), key ='algo', on_change=changeAlgo)
         model = algorithms[st.session_state['algo']]()
-    
+        if "SVC" in list(algorithms):
+            cm, acc,f1 = train_test(df,model,algorithms)
+            st.caption(acc)
+        else:
+            mse, r2 = train_test(df,model,algorithms)
+            st.caption(mse)
