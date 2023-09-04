@@ -60,7 +60,7 @@ def histo_residu(y_train, y_test):
     # Créez une fonction pour tracer la courbe d'apprentissage
 def courbe_appr(model, X, y):
     train_sizes, train_scores, test_scores = learning_curve(
-        model, X, y, train_sizes=np.linspace(0.1, 1.0, 5), cv=5, scoring='accuracy')
+        model, X, y, train_sizes=np.linspace(0.1, 1.0, 50))
 
     train_scores_mean = np.mean(train_scores, axis=1)
     test_scores_mean = np.mean(test_scores, axis=1)

@@ -61,5 +61,5 @@ if __name__ == '__main__':
             clf = model.fit(X_train, y_train)
             y_pred = clf.predict(X_test)
             mse, r2 = train_test(X_train, y_train, X_test, y_test,model,algorithms)
-            pt.digramme_dispersion(y_pred, y_test).show()
+            st.pyplot(pt.courbe_appr(model, X, y))
             st.caption(mse)
