@@ -1,9 +1,10 @@
 from models.model import dt_param_selector
-
+import numpy as np
 def getAlgorims(df):
-    classification = [('Decision Tree', dt_param_selector())]
-    regression = [('rasso', dt_param_selector())]
-    if isinstance(df['target'], str):
+    classification = {'DecisionTreeClassifier': dt_param_selector}
+    regression = {'Rasso': dt_param_selector}
+    column_type = df['target'].dtype
+    if column_type == 'object':
         return classification
     else:
         return regression

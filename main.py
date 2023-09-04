@@ -18,8 +18,7 @@ def sidebar():
     st.sidebar.selectbox('please select your dataset', options= ['Diabet inde','Vin'], key ='data_sb', on_change=changeData)
     st.sidebar.file_uploader("Choose a file", type=['csv'], key='uploaded_file',on_change= load)
     
-    algorithms = getAlgorims(df)
-    st.sidebar.selectbox('please select your algorithm', options= algorithms[:][0], key ='algo', on_change=changeAlgo)
+    
 
 def changeAlgo():
     pass
@@ -43,4 +42,8 @@ if __name__ == '__main__':
     else :
         df = getData(st.session_state['data_sb'],None)
         table = st.table(df.head())
+    if df is not None:
+        algorithms = getAlgorims(df)
+        st.sidebar.selectbox('please select your algorithm', options= algorithms.keys(), key ='algo', on_change=changeAlgo)
+        model = algorithms[st.session_state['algo']]()
     
