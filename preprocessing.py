@@ -73,7 +73,7 @@ class DataPreprocessor:
         self.label_encoder()
         self.outliers()
         self.standardisation()
-        self.split_data()
+        return self.split_data()
 
 # Créer une instance du préprocesseur de données
 preprocessor = DataPreprocessor(df)
@@ -81,4 +81,4 @@ preprocessor.preprocess_data()
 X_train, X_test, y_train, y_test = (
     preprocessor.X_train, preprocessor.X_test, preprocessor.y_train, preprocessor.y_test
 )
-print(y_test)
+#print(y_test)
