@@ -4,67 +4,81 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.ensemble import IsolationForest
 from sklearn.model_selection import train_test_split
+import Utils.bdd
 
-# Création de données aléatoires
-np.random.seed(42)  # Pour obtenir des données aléatoires reproductibles
-data = {
-    'Colonne1': np.random.randint(1, 100, 200),
-    'Colonne2': np.random.uniform(0.0, 1.0, 200),
-    'Target': np.random.choice(['A', 'B', 'C', 'D'], 200),
-}
+df = Utils.bdd.get_data_to_df()
 
-# Création du DataFrame
-df = pd.DataFrame(data)
 
-# Afficher les premières lignes du DataFrame
-print(df.head())
-
-# POO
 class DataPreprocessor:
-    def __init__(self, df, X, y):
+    def __init__(self, df):
         self.df = df
-        self.X =df.iloc[:, :-1].values
-        self.y = df['Target']
+        self.X = None
+        self.y = None
+        self.X_train = None
+        self.X_test = None
+        self.y_train = None
+        self.y_test = None
     
-    def missing_values(self, strategy='mean'):
-        imputer = SimpleImputer(strategy=strategy)
-        imputer = imputer.fit(self.X)
-        self.X = imputer.transform(self.X)
-
-    def label_encoder_x(self):
-        labelencoder_X = LabelEncoder()
-        self.X[:, 0] = labelencoder_X.fit_transform(self.X[:, 0])
-
-    def label_encoder_y(self):
-        labelencoder_y = LabelEncoder()
-        self.y = labelencoder_y.fit_transform(self.y)
+    def missing_values(self, strategy='median', threshold=0.2):
+        for column in self.df.columns:
+            # Calcul du pourcentage de valeurs manquantes dans la colonne
+            missing_percentage = self.df[column].isnull().mean()
+            # Vérifiez si le pourcentage de valeurs manquantes dépasse le seuil
+            if missing_percentage > threshold:
+                # Supprimez la colonne si le seuil est dépassé
+                self.df.drop(columns=[column], inplace=True)
+            else:
+                # Si le seuil n'est pas dépassé, vérifiez le type de données de la colonne
+                if self.df[column].dtype == 'float':
+                    # Imputez les valeurs manquantes avec la médiane pour les données numériques
+                    imputer = SimpleImputer(strategy=strategy)
+                    self.df[column] = imputer.fit_transform(self.df[[column]])
+                elif self.df[column].dtype == 'int':
+                    # Imputez les valeurs manquantes avec la médiane pour les données numériques
+                    imputer = SimpleImputer(strategy=strategy)
+                    self.df[column] = imputer.fit_transform(self.df[[column]])
+                elif self.df[column].dtype == 'object':
+                    # Imputez les valeurs manquantes avec une stratégie appropriée pour les données catégorielles (par exemple, classe majoritaire)
+                    self.df[column].fillna(self.df[column].mode().iloc[0], inplace=True)
     
-    def one_hot_encoder(self):
-        onehotencoder = OneHotEncoder(categorical_features=[0])
-        self.X = onehotencoder.fit_transform(self.X).toarray()
+        return self.df
+
+    def label_encoder(self):
+        labelencoder = LabelEncoder()
+        for column in self.df.columns:
+            self.df[column] = labelencoder.fit_transform(self.df[column])
+        return self.df
 
     def outliers(self, contamination=0.05):
         outlier_detector = IsolationForest(contamination=contamination)
-        outlier_labels = outlier_detector.fit_predict(self.X)
+        outlier_labels = outlier_detector.fit_predict(self.df)
         self.df = self.df[outlier_labels == 1]
+        # Conservez les données originales
+        self.original_df = self.df.copy()
+        return self.df
 
     def standardisation(self):
         scaler = StandardScaler()
-        self.X = scaler.fit_transform(self.X)
+        self.df = scaler.fit_transform(self.df)
+        return self.df
          
-def split_data(X, y):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3,random_state = 42)
-
+    def split_data(self):
+        self.X = df.drop('target', axis = 1)
+        self.y = df['target']
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size = 0.3,random_state = 42)
+        return (self.X_train, self.X_test, self.y_train, self.y_test)
+    
+    def preprocess_data(self):
+        self.missing_values()
+        self.label_encoder()
+        self.outliers()
+        self.standardisation()
+        self.split_data()
 
 # Créer une instance du préprocesseur de données
-preprocessor = DataPreprocessor(df, X, y)
-print(preprocessor)
-
-
-# programmation non objet
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 42) # split
-
-essai = [X_train, X_test, y_train, y_test]
-for i in essai:
-    print(i)
+preprocessor = DataPreprocessor(df)
+preprocessor.preprocess_data()
+X_train, X_test, y_train, y_test = (
+    preprocessor.X_train, preprocessor.X_test, preprocessor.y_train, preprocessor.y_test
+)
+print(y_test)
