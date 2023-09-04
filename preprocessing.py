@@ -4,20 +4,10 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.ensemble import IsolationForest
 from sklearn.model_selection import train_test_split
+import Utils.bdd
 
-# Création de données aléatoires
-np.random.seed(42)  # Pour obtenir des données aléatoires reproductibles
-data = {
-    'Colonne1': np.random.randint(1, 100, 200),
-    'Colonne2': np.random.uniform(0.0, 1.0, 200),
-    'target': np.random.choice(['A', 'B', 'C', 'D'], 200),
-}
+df = Utils.bdd.get_data_to_df()
 
-# Création du DataFrame
-df = pd.DataFrame(data)
-
-# Afficher les premières lignes du DataFrame
-print(df.head())
 
 class DataPreprocessor:
     def __init__(self, df):
@@ -29,10 +19,28 @@ class DataPreprocessor:
         self.y_train = None
         self.y_test = None
     
-    def missing_values(self, strategy='median'):
-        imputer = SimpleImputer(strategy=strategy)
-        imputer = imputer.fit(self.df)
-        self.df = imputer.transform(self.df)
+    def missing_values(self, strategy='median', threshold=0.2):
+        for column in self.df.columns:
+            # Calcul du pourcentage de valeurs manquantes dans la colonne
+            missing_percentage = self.df[column].isnull().mean()
+            # Vérifiez si le pourcentage de valeurs manquantes dépasse le seuil
+            if missing_percentage > threshold:
+                # Supprimez la colonne si le seuil est dépassé
+                self.df.drop(columns=[column], inplace=True)
+            else:
+                # Si le seuil n'est pas dépassé, vérifiez le type de données de la colonne
+                if self.df[column].dtype == 'float':
+                    # Imputez les valeurs manquantes avec la médiane pour les données numériques
+                    imputer = SimpleImputer(strategy=strategy)
+                    self.df[column] = imputer.fit_transform(self.df[[column]])
+                elif self.df[column].dtype == 'int':
+                    # Imputez les valeurs manquantes avec la médiane pour les données numériques
+                    imputer = SimpleImputer(strategy=strategy)
+                    self.df[column] = imputer.fit_transform(self.df[[column]])
+                elif self.df[column].dtype == 'object':
+                    # Imputez les valeurs manquantes avec une stratégie appropriée pour les données catégorielles (par exemple, classe majoritaire)
+                    self.df[column].fillna(self.df[column].mode().iloc[0], inplace=True)
+    
         return self.df
 
     def label_encoder(self):
@@ -61,13 +69,16 @@ class DataPreprocessor:
         return (self.X_train, self.X_test, self.y_train, self.y_test)
     
     def preprocess_data(self):
-        self.label_encoder()
         self.missing_values()
+        self.label_encoder()
         self.outliers()
         self.standardisation()
         self.split_data()
 
 # Créer une instance du préprocesseur de données
 preprocessor = DataPreprocessor(df)
-
-print(preprocessor.preprocess_data())
+preprocessor.preprocess_data()
+X_train, X_test, y_train, y_test = (
+    preprocessor.X_train, preprocessor.X_test, preprocessor.y_train, preprocessor.y_test
+)
+print(y_test)
