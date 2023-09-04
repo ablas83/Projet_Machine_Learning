@@ -3,9 +3,8 @@ from sklearn.metrics import accuracy_score, f1_score, r2_score, mean_squared_err
 import streamlit as st
 import preprocessing
 
-def train_test(data, model, type_model):
-    preprocessor = preprocessing.DataPreprocessor(data)
-    X_train, X_test, y_train, y_test = preprocessor.preprocess_data()
+def train_test(X_train,y_train,X_test, y_test, model, type_model):
+    
     clf = model.fit(X_train, y_train)
     y_pred = clf.predict(X_test)
 

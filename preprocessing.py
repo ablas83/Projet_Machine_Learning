@@ -77,7 +77,7 @@ class DataPreprocessor:
         #self.y = self.df['target']
         self.X = self.df
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size = 0.3,random_state = 42)
-        return (self.X_train, self.X_test, self.y_train, self.y_test)
+        return (self.X_train, self.X_test, self.y_train, self.y_test,self.X,self.y)
     
     def preprocess_data(self):
         self.missing_values()
