@@ -3,6 +3,7 @@ from Utils.bdd import connection_database, get_data_to_df
 from helpers.selection import getAlgorims
 from Utils.train_test import train_test
 import preprocessing
+import Utils.plots as pt
 df = None
 table =  None
 def intro():
@@ -51,8 +52,14 @@ if __name__ == '__main__':
         preprocessor = preprocessing.DataPreprocessor(df)
         X_train, X_test, y_train, y_test,X,y = preprocessor.preprocess_data()
         if "SVC" in list(algorithms):
+            clf = model.fit(X_train, y_train)
+            y_pred = clf.predict(X_test)
             cm, acc,f1 = train_test(X_train, y_train,X_test, y_test,model,algorithms)
+            st.pyplot(pt.conf_matrix(y_pred,y_test))
             st.caption(acc)
         else:
+            clf = model.fit(X_train, y_train)
+            y_pred = clf.predict(X_test)
             mse, r2 = train_test(X_train, y_train, X_test, y_test,model,algorithms)
+            pt.digramme_dispersion(y_pred, y_test).show()
             st.caption(mse)

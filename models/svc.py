@@ -4,7 +4,7 @@ from sklearn.svm import SVC
 
 
 def svc_param_selector():
-    C = st.sidebar.number_input("C", 0.01, 2.0, 1.0, 0.01)
+    C = st.sidebar.number_input("C", 0.01, 100.0, 1.0, 1.0)
     kernel = st.sidebar.selectbox("kernel", ("rbf", "linear", "poly", "sigmoid"))
     params = {"C": C, "kernel": kernel}
     model = SVC(**params)
