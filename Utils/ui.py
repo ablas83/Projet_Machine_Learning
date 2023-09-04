@@ -84,7 +84,7 @@ def model_selector():
     return model_type, model
 
 
-def generate_snippet(
+'''def generate_snippet(
     model, model_type, n_samples, train_noise, test_noise, dataset, degree
 ):
     train_noise = np.round(train_noise, 3)
@@ -133,14 +133,14 @@ def generate_snippet(
     >>> train_accuracy = accuracy_score(y_train, y_train_pred)
     >>> test_accuracy = accuracy_score(y_test, y_test_pred)
     """
-    return snippet
+    return snippet'''
 
 
-def polynomial_degree_selector():
+'''def polynomial_degree_selector():
     return st.sidebar.number_input("Highest polynomial degree", 1, 10, 1, 1)
 
-
-def footer():
+'''
+'''def footer():
     st.sidebar.markdown("---")
     st.sidebar.markdown(
         """
@@ -148,4 +148,4 @@ def footer():
             img_to_bytes("./images/github.png")
         ),
         unsafe_allow_html=True,
-    )
+    )'''
