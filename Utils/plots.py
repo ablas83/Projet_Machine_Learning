@@ -7,8 +7,6 @@ import scipy.stats as stats
 import seaborn as sns
 
 
-# graph modèles régression
-
 def digramme_dispersion(y_train, y_test):
 
     plt.scatter(y_train, y_test, color='blue', marker='o', label='Données réelles vs. Prédites')
@@ -76,12 +74,6 @@ def courbe_appr(model, X, y):
     plt.legend(loc='best')
     plt.grid(True)
     plt.show()
-
-    # Appelez la fonction pour tracer la courbe d'apprentissage
-    #courbe_appr(model, X, y)
-
-
-# graphe modèles classification
 
 def quant_quant(y_train, y_test):
     
