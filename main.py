@@ -52,6 +52,13 @@ if __name__ == '__main__':
             table = st.table(df.head())
     if df is not None:
         algorithms = getAlgorims(df)
+        with st.expander("Analyse descriptive"):
+            st.table(df.describe())
+            st.table(df.info())
+            st.pyplot(pt.distribution_target(df))
+        with st.expander("Etude de corrélation"):
+            st.pyplot(pt.etude_correlation(df))
+
         st.sidebar.selectbox('please select your algorithm', options= algorithms.keys(), key ='algo', on_change=changeAlgo)
         st.sidebar.toggle('Modifier les Hyperparamètres', key='on')
         st.sidebar.toggle('Hyperparamètres optimals', key='optimal')
@@ -71,17 +78,24 @@ if __name__ == '__main__':
             else:
                 y_pred = clf.predict(X_test)
                 cm, acc,f1 = train_test(y_pred, y_test,algorithms)
-                st.pyplot(pt.conf_matrix(y_test,y_pred))
-                st.pyplot(pt.courbe_appr(model, X, y))
-                st.pyplot(pt.roc_class(X_train, X_test, y_train, y_test))
-                st.caption(acc)
+                with st.expander("Evaluation du modéle"):
+                    st.pyplot(pt.conf_matrix(y_test,y_pred))
+                    st.pyplot(pt.courbe_appr(model, X, y))
+                    st.pyplot(pt.roc_class(X_train, X_test, y_train, y_test))
+                with st.expander("Metrics"):
+                    st.text("cm : %s" %cm)
+                    st.text("acc : %s" %acc)
+                    st.text("F1 : %s" %f1)
         else:
             clf = model.fit(X_train, y_train)
             y_pred = clf.predict(X_test)
             mse, r2 = train_test(y_pred, y_test,algorithms)
-            st.pyplot(pt.courbe_appr(model, X, y))
-            st.pyplot(pt.quant_quant(y_test, y_pred))
-            st.plotly_chart(pt.histo_residu(y_test, y_pred))
-            st.pyplot(pt.digramme_dispersion(y_test, y_pred))
-            st.caption(mse)
+            with st.expander("Evaluation du modéle"):
+                st.pyplot(pt.courbe_appr(model, X, y))
+                st.pyplot(pt.quant_quant(y_test, y_pred))
+                st.plotly_chart(pt.histo_residu(y_test, y_pred))
+                st.pyplot(pt.digramme_dispersion(y_test, y_pred))
+            with st.expander("Metrics"):
+                st.text("Mse : %s"%mse)
+                st.text("Score R2 : %s" %r2)
             

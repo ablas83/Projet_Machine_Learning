@@ -4,6 +4,7 @@ from sklearn.model_selection import learning_curve
 from sklearn.metrics import confusion_matrix, roc_curve, roc_auc_score, precision_recall_curve, average_precision_score
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.decomposition import PCA
+import plotly.express as px
 import scipy.stats as stats
 import seaborn as sns
 import mpld3
@@ -59,7 +60,7 @@ def courbe_appr(model, X, y):
     train_scores_mean = np.mean(train_scores, axis=1)
     test_scores_mean = np.mean(test_scores, axis=1)
 
-    fig = plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(8, 6))
     plt.title('Courbe d\'apprentissage')
     plt.xlabel('Taille de l\'ensemble d\'entraînement')
     plt.ylabel('Erreur quadratique moyenne')
@@ -71,10 +72,10 @@ def courbe_appr(model, X, y):
     plt.grid(True)
     plt.show()
 
-def quant_quant(y_train, y_pred):
+def quant_quant(y_test, y_pred):
     
     # Supposons que "residus" contienne les résidus de votre modèle.
-    residus = y_train - y_pred
+    residus = y_test - y_pred
 
     # Calculez les quantiles des résidus
     sorted_residus = np.sort(residus)
@@ -162,3 +163,25 @@ def courbe_prec_recall(y_true, y_scores):
     plt.legend(loc='best')
     plt.grid(True)
     plt.show()
+
+def distribution_target(df):
+    plt.figure(figsize=(8, 6))
+    sns.countplot(x='target', data=df)
+    plt.title('Distribution de la variable cible')
+    plt.show()
+
+def etude_correlation(data):
+    data1 =data
+    data1['target']=data1['target'].astype('category').cat.codes
+
+    mask = np.triu(data1.corr())
+    fig, ax = plt.subplots(figsize=(7, 7))
+    cmap = sns.diverging_palette(15, 160, n=11, s=100)
+    sns.heatmap(data1.corr(),
+            mask=mask,
+            annot=True,
+            cmap=cmap,
+            center=0,
+            vmin=-1,
+            vmax=1,
+            ax=ax)
