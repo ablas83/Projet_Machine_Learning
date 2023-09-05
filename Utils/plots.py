@@ -73,10 +73,10 @@ def courbe_appr(model, X, y):
     plt.grid(True)
     plt.show()
 
-def quant_quant(y_train, y_pred):
+def quant_quant(y_test, y_pred):
     
     # Supposons que "residus" contienne les résidus de votre modèle.
-    residus = y_train - y_pred
+    residus = y_test - y_pred
 
     # Calculez les quantiles des résidus
     sorted_residus = np.sort(residus)
