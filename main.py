@@ -5,6 +5,10 @@ from Utils.train_test import train_test
 import preprocessing
 import Utils.plots as pt
 import pandas as pd
+import plotly.graph_objs as go
+import plotly.io as pio
+from PIL import Image
+import io
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 df = None
@@ -12,8 +16,7 @@ table =  None
 def intro():
     return st.set_page_config(
         page_title="ML Playground",
-        layout="centered",
-        initial_sidebar_state="auto"
+        
     )
 
 def header():
@@ -83,9 +86,33 @@ if __name__ == '__main__':
                     st.pyplot(pt.courbe_appr(model, X, y))
                     st.pyplot(pt.roc_class(X_train, X_test, y_train, y_test))
                 with st.expander("Metrics"):
-                    st.text("cm : %s" %cm)
-                    st.text("acc : %s" %acc)
-                    st.text("F1 : %s" %f1)
+                    jauge= go.Indicator(
+                        mode="gauge+number+delta",
+                        value=acc,
+                        title={"text": f"Accuracy (test)"},
+                        domain={"x": [0, 1], "y": [0, 1]},
+                        gauge={"axis": {"range": [0, 1]}},
+                        delta={"reference": acc},
+                    )
+                    #fig = go.Figure(jauge)
+                    jauge2= go.Indicator(
+                        mode="gauge+number+delta",
+                        value=f1,
+                        title={"text": f"score f1"},
+                        domain={"x": [0, 1], "y": [0, 1]},
+                        gauge={"axis": {"range": [0, 1]}},
+                        delta={"reference": f1},
+                    )
+                    fig = go.Figure(jauge)
+                    fig1 = go.Figure(jauge2)
+                    #img_bytes = fig.to_image(format="png",width = 150, height = 100)
+                    #st.image(Image.open(io.BytesIO(img_bytes)),use_column_width=True)
+                    col1, _, col2 = st.columns([1, 1, 1])
+                    with col1:
+                        st.plotly_chart(fig,use_container_width=True)
+                    with col2:
+                        st.plotly_chart(fig1,use_container_width=True)
+
         else:
             clf = model.fit(X_train, y_train)
             y_pred = clf.predict(X_test)
@@ -96,6 +123,31 @@ if __name__ == '__main__':
                 st.plotly_chart(pt.histo_residu(y_test, y_pred))
                 st.pyplot(pt.digramme_dispersion(y_test, y_pred))
             with st.expander("Metrics"):
-                st.text("Mse : %s"%mse)
-                st.text("Score R2 : %s" %r2)
+                jauge= go.Indicator(
+                        mode="gauge+number+delta",
+                        value=mse,
+                        title={"text": f"MSE (test)"},
+                        domain={"x": [0, 1], "y": [0, 1]},
+                        gauge={"axis": {"range": [0, 1]}},
+                        delta={"reference": mse},
+                    )
+                    #fig = go.Figure(jauge)
+                jauge2= go.Indicator(
+                        mode="gauge+number+delta",
+                        value=r2,
+                        title={"text": f"score r2"},
+                        domain={"x": [0, 1], "y": [0, 1]},
+                        gauge={"axis": {"range": [0, 1]}},
+                        delta={"reference": r2},
+                    )
+                fig = go.Figure(jauge)
+                fig1 = go.Figure(jauge2)
+                    #img_bytes = fig.to_image(format="png",width = 150, height = 100)
+                    #st.image(Image.open(io.BytesIO(img_bytes)),use_column_width=True)
+                col1, _, col2 = st.columns([1, 1, 1])
+                with col1:
+                    st.plotly_chart(fig,use_container_width=True)
+                with col2:
+                    st.plotly_chart(fig1,use_container_width=True)
+               
             
