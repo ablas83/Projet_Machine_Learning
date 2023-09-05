@@ -4,6 +4,7 @@ from sklearn.model_selection import learning_curve
 from sklearn.metrics import confusion_matrix, roc_curve, roc_auc_score, precision_recall_curve, average_precision_score
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.decomposition import PCA
+import plotly.express as px
 import scipy.stats as stats
 import seaborn as sns
 import mpld3
@@ -59,7 +60,7 @@ def courbe_appr(model, X, y):
     train_scores_mean = np.mean(train_scores, axis=1)
     test_scores_mean = np.mean(test_scores, axis=1)
 
-    fig = plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(8, 6))
     plt.title('Courbe d\'apprentissage')
     plt.xlabel('Taille de l\'ensemble d\'entraînement')
     plt.ylabel('Erreur quadratique moyenne')
@@ -67,12 +68,10 @@ def courbe_appr(model, X, y):
     plt.plot(train_sizes, train_scores_mean, label='Score d\'entraînement', color='blue', marker='o')
     plt.plot(train_sizes, test_scores_mean, label='Score de validation', color='red', marker='o')
 
-    fig_html = mpld3.fig_to_html(fig)
-    components.html(fig_html, height=600)
 
-    # plt.legend(loc='best')
-    # plt.grid(True)
-    # plt.show()
+    plt.legend(loc='best')
+    plt.grid(True)
+    plt.show()
 
 def quant_quant(y_train, y_pred):
     
