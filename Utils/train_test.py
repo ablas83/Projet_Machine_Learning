@@ -3,10 +3,9 @@ from sklearn.metrics import accuracy_score, f1_score, r2_score, mean_squared_err
 import streamlit as st
 import preprocessing
 
-def train_test(X_train,y_train,X_test, y_test, model, type_model):
+def train_test(y_pred, y_test, type_model):
     
-    clf = model.fit(X_train, y_train)
-    y_pred = clf.predict(X_test)
+   
 
     if "SVC" in list(type_model):
         cm = confusion_matrix(y_test, y_pred)
