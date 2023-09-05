@@ -4,6 +4,7 @@ from helpers.selection import getAlgorims
 from Utils.train_test import train_test
 import preprocessing
 import Utils.plots as pt
+st.set_option('deprecation.showPyplotGlobalUse', False)
 df = None
 table =  None
 def intro():
@@ -55,11 +56,16 @@ if __name__ == '__main__':
             clf = model.fit(X_train, y_train)
             y_pred = clf.predict(X_test)
             cm, acc,f1 = train_test(X_train, y_train,X_test, y_test,model,algorithms)
-            st.pyplot(pt.conf_matrix(y_pred,y_test))
+            st.pyplot(pt.conf_matrix(y_test,y_pred))
+            st.pyplot(pt.courbe_appr(model, X, y))
+            st.pyplot(pt.roc_class(X_train, X_test, y_train, y_test))
             st.caption(acc)
         else:
             clf = model.fit(X_train, y_train)
             y_pred = clf.predict(X_test)
             mse, r2 = train_test(X_train, y_train, X_test, y_test,model,algorithms)
             st.pyplot(pt.courbe_appr(model, X, y))
+            st.pyplot(pt.quant_quant(y_test, y_pred))
+            st.plotly_chart(pt.histo_residu(y_test, y_pred))
+            st.pyplot(pt.digramme_dispersion(y_test, y_pred))
             st.caption(mse)
