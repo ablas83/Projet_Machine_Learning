@@ -67,12 +67,9 @@ def courbe_appr(model, X, y):
     plt.plot(train_sizes, train_scores_mean, label='Score d\'entraînement', color='blue', marker='o')
     plt.plot(train_sizes, test_scores_mean, label='Score de validation', color='red', marker='o')
 
-    fig_html = mpld3.fig_to_html(fig)
-    components.html(fig_html, height=600)
-
-    # plt.legend(loc='best')
-    # plt.grid(True)
-    # plt.show()
+    plt.legend(loc='best')
+    plt.grid(True)
+    plt.show()
 
 def quant_quant(y_train, y_pred):
     

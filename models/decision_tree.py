@@ -18,7 +18,7 @@ def dt_param_selector():
         }
     
     if st.session_state['optimal'] :
-        m = GridSearchCV(DecisionTreeClassifier(),{"criterion":["gini", "entropy"] ,"max_depth": list(range(1,51,10)),"min_samples_split": list(range(1,21,5)),"max_features": [None, "auto", "sqrt", "log2"]},cv=5)
+        m = GridSearchCV(DecisionTreeClassifier(random_state=42),{"criterion":["gini", "entropy"] ,"max_depth": list(range(1,51,10)),"min_samples_split": list(range(1,21,5)),"max_features": [None, "auto", "sqrt", "log2"]},cv=5, verbose=True)
         return m
     else :
         model = DecisionTreeClassifier(**params)

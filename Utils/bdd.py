@@ -38,7 +38,7 @@ def get_data_to_df(data_name, db, file_path):
         #file_path = filedialog.askopenfilename(title="Sélectionnez un fichier CSV")
         
         # Lire le fichier CSV en DataFrame
-        df = pd.read_csv(file_path, sep=';')
+        df = pd.read_csv(file_path, sep=',')
     
     return df 
 

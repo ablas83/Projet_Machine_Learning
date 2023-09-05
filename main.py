@@ -65,7 +65,7 @@ if __name__ == '__main__':
                 y_pred = best_model.predict(X_test)
                 best_params_df = pd.DataFrame(clf.best_params_, index=['Valeur'])
                 cm, acc,f1 = train_test(y_pred, y_test,algorithms)
-                pt.courbe_appr(best_model,X, y)
+                st.pyplot(pt.courbe_appr(best_model,X, y))
                 st.caption(acc)
                 st.dataframe(best_params_df)
             else:
