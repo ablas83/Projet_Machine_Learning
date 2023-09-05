@@ -8,8 +8,6 @@ from sklearn import set_config
 set_config(transform_output="pandas")
 
 
-
-
 class DataPreprocessor:
     def __init__(self, df):
         self.df = pd.DataFrame(df)
@@ -20,7 +18,7 @@ class DataPreprocessor:
         self.y_train = None
         self.y_test = None
     
-    def missing_values(self, strategy='median', threshold=0.2):
+    def missing_values(self, strategy='median', threshold=0.4):
         for column in self.df.columns:
             # Calcul du pourcentage de valeurs manquantes dans la colonne
             missing_percentage = self.df[column].isnull().mean()
@@ -46,6 +44,7 @@ class DataPreprocessor:
     
     def drop_id(self):
         self.df = self.df.drop("id",axis=1)
+        self.df = self.df.reset_index(drop=True)
         return self.df
 
     def label_encoder(self):
@@ -54,7 +53,7 @@ class DataPreprocessor:
             self.df[column] = labelencoder.fit_transform(self.df[column])
         return self.df
 
-    def outliers(self, contamination=0.05):
+    def outliers(self, contamination=0.1):
         outlier_detector = IsolationForest(contamination=contamination)
         outlier_labels = outlier_detector.fit_predict(self.df)
         self.df = self.df[outlier_labels == 1]
@@ -64,17 +63,11 @@ class DataPreprocessor:
 
     def standardisation(self):
         scaler = StandardScaler()
-        df1 = self.df
-        # for column in self.df.columns:
-        #     if column != "target":
-        #         self.df[column] = scaler.fit_transform(self.df[column])
         self.y = self.df['target']
         self.df = scaler.fit_transform(self.df.drop('target', axis=1))
-        #self.df = pd.DataFrame(self.df,columns=df1.columns)
         return self.df
          
     def split_data(self):
-        #self.y = self.df['target']
         self.X = self.df
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size = 0.3,random_state = 42)
         return (self.X_train, self.X_test, self.y_train, self.y_test,self.X,self.y)
@@ -85,13 +78,4 @@ class DataPreprocessor:
         self.label_encoder()
         self.outliers()
         self.standardisation()
-        print(self.y)
         return self.split_data()
-
-# Créer une instance du préprocesseur de données
-# preprocessor = DataPreprocessor(df)
-# preprocessor.preprocess_data()
-# X_train, X_test, y_train, y_test = (
-#     preprocessor.X_train, preprocessor.X_test, preprocessor.y_train, preprocessor.y_test
-# )
-#print(y_test)

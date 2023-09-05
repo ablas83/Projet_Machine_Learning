@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import learning_curve
-from sklearn.metrics import confusion_matrix, roc_curve, auc
+from sklearn.metrics import confusion_matrix, roc_curve, roc_auc_score, precision_recall_curve, average_precision_score
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.decomposition import PCA
 import scipy.stats as stats
 import seaborn as sns
@@ -9,60 +10,51 @@ import mpld3
 import streamlit.components.v1 as components
 
 
-# graph modèles régression
 
-def digramme_dispersion(y_train, y_test):
+def digramme_dispersion(y_train, y_pred):
 
-    plt.scatter(y_train, y_test, color='blue', marker='o', label='Données réelles vs. Prédites')
-
+    plt.scatter(y_train, y_pred, color='blue', marker='o', label='Données réelles vs. Prédites')
     # Ajoutez une ligne de référence (y=x) pour montrer une prédiction parfaite
     plt.plot([min(y_train), max(y_train)], [min(y_train), max(y_train)], color='red', linestyle='--', lw=2, label='Prédiction parfaite')
-
     # Ajoutez des étiquettes et une légende
     plt.xlabel('Valeurs réelles')
     plt.ylabel('Valeurs prédites')
     plt.legend(loc='best')
-
     # Affichez le diagramme de dispersion
     plt.title('Diagramme de dispersion entre les valeurs réelles et prédites')
     plt.grid(True)
     plt.show()
 
 
-def courbe_regression(X, y, y_test):
+def courbe_regression(X, y, y_pred):
 
     # Créez un graphique avec les points de données réelles
     plt.scatter(X, y, color='blue', label='Données réelles')
-
     # Tracez la ligne de régression (ligne de prédiction) en utilisant les valeurs prédites
-    plt.plot(X, y_test, color='red', linestyle='-', linewidth=2, label='Ligne de régression')
-
+    plt.plot(X, y_pred, color='red', linestyle='-', linewidth=2, label='Ligne de régression')
     plt.xlabel('Caractéristiques')
     plt.ylabel('Valeurs réelles / prédites')
     plt.legend(loc='best')
-
     plt.title('Courbe de régression entre les données réelles et prédites')
     plt.grid(True)
     plt.show()
 
 
-def histo_residu(y_train, y_test):
-
+def histo_residu(y_test, y_pred):
     # Calculez les résidus en soustrayant les valeurs réelles des valeurs prédites
-    residus = y_train - y_test
+    residus = y_test - y_pred
 
-    plt.hist(residus, bins=10, color='blue', alpha=0.7, edgecolor='black')
-
-    plt.xlabel('Résidus')
-    plt.ylabel('Fréquence')
-    plt.title('Histogramme des résidus')
-    plt.grid(True)
-    plt.show()
+    # Créez un histogramme Plotly
+    fig = px.histogram(residus, nbins=10)
+    fig.update_traces(marker=dict(color='blue', opacity=0.7, line=dict(color='black', width=1)))
+    fig.update_layout(xaxis_title='Résidus', yaxis_title='Fréquence', title='Histogramme des résidus')
+    
+    return fig
 
     # Créez une fonction pour tracer la courbe d'apprentissage
 def courbe_appr(model, X, y):
     train_sizes, train_scores, test_scores = learning_curve(
-        model, X, y, train_sizes=np.linspace(0.1, 1.0, 5), cv=5, scoring='accuracy')
+        model, X, y, train_sizes=np.linspace(0.1, 1.0, 50))
 
     train_scores_mean = np.mean(train_scores, axis=1)
     test_scores_mean = np.mean(test_scores, axis=1)
@@ -82,16 +74,10 @@ def courbe_appr(model, X, y):
     # plt.grid(True)
     # plt.show()
 
-    # Appelez la fonction pour tracer la courbe d'apprentissage
-    #courbe_appr(model, X, y)
-
-
-# graphe modèles classification
-
-def quant_quant(y_train, y_test):
+def quant_quant(y_train, y_pred):
     
     # Supposons que "residus" contienne les résidus de votre modèle.
-    residus = y_train - y_test
+    residus = y_train - y_pred
 
     # Calculez les quantiles des résidus
     sorted_residus = np.sort(residus)
@@ -108,10 +94,10 @@ def quant_quant(y_train, y_test):
     plt.show()
 
 
-def conf_matrix(y_train, y_test):
+def conf_matrix(y_train, y_pred):
 
     # Calculez la matrice de confusion
-    conf_matrix = confusion_matrix(y_train, y_test)
+    conf_matrix = confusion_matrix(y_train, y_pred)
 
     # Créez un graphique de la matrice de confusion
     plt.figure(figsize=(6, 6))
@@ -122,38 +108,60 @@ def conf_matrix(y_train, y_test):
     plt.show()
 
 
-def roc(y_train, y_prob):
+def roc_class(X_train, X_test, y_train, y_test):
 
-    # Calculez la courbe ROC
-    fpr, tpr, _ = roc_curve(y_train, y_prob)
-    roc_auc = auc(fpr, tpr)
+    clf_tree = DecisionTreeClassifier()
+    clf_tree.fit(X_train, y_train)
 
-    # Tracez la courbe ROC
-    plt.figure(figsize=(6, 6))
-    plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'Courbe ROC (AUC = {roc_auc:.2f})')
-    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('Taux de Faux Positifs')
-    plt.ylabel('Taux de Vrais Positifs')
-    plt.title('Courbe ROC')
+    y_score1 = clf_tree.predict_proba(X_test)[:,1]
+
+    false_positive_rate1, true_positive_rate1, threshold1 = roc_curve(y_test, y_score1)
+
+    plt.subplots(1, figsize=(10, 10))
+    plt.title('Receiver Operating Characteristic')
+    plt.plot(false_positive_rate1, true_positive_rate1, label='Courbe ROC')
+    plt.plot([0, 1], ls="--", label='Ligne de Référence')
+    plt.plot([0, 0], [1, 0], c=".7"), plt.plot([1, 1], c=".7")
+    plt.ylabel('True Positive Rate')
+    plt.xlabel('False Positive Rate')
+
+    # Ajoutez la légende
     plt.legend(loc='lower right')
+
     plt.show()
 
 
-def disp_classes(X, y_test):
+def disp_classes(X, y): # ne fonctionne pas, WIP
 
     # Réduisez les dimensions à 2D en utilisant l'analyse en composantes principales (PCA)
     pca = PCA(n_components=2)
     X_2d = pca.fit_transform(X)
+    y = y.to_numpy()
 
     # Créez un diagramme de dispersion des classes
     plt.figure(figsize=(8, 6))
     colors = ['blue', 'red']
     for i in range(2):
-        plt.scatter(X_2d[y_test == i, 0], X_2d[y_test == i, 1], color=colors[i], label=f'Classe {i}')
+        plt.scatter(X_2d[y == i, 0], X_2d[y == i, 1], color=colors[i], label=f'Classe {i}')
     plt.xlabel('Composante Principale 1')
     plt.ylabel('Composante Principale 2')
     plt.legend()
     plt.title('Diagramme de Dispersion des Classes (2D)')
+    plt.show()
+
+def courbe_prec_recall(y_true, y_scores):
+    # Calculer la courbe de précision-rappel
+    precision, recall, _ = precision_recall_curve(y_true, y_scores)
+
+    # Calculer l'aire sous la courbe de précision-rappel (AUC-PR)
+    auc_pr = average_precision_score(y_true, y_scores)
+
+    # Tracez la courbe de précision-rappel
+    plt.figure(figsize=(8, 6))
+    plt.plot(recall, precision, color='darkorange', lw=2, label='Courbe PR (AUC = %0.2f)' % auc_pr)
+    plt.xlabel('Rappel (Recall)')
+    plt.ylabel('Précision (Precision)')
+    plt.title('Courbe de Précision-Rappel')
+    plt.legend(loc='best')
+    plt.grid(True)
     plt.show()
