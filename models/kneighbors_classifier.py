@@ -10,7 +10,10 @@ def knn_param_selector():
         "metric", ("minkowski", "euclidean", "manhattan", "chebyshev", "mahalanobis")
         )
 
-        params = {"n_neighbors": n_neighbors, "metric": metric}
+        params = {
+            "n_neighbors": n_neighbors,
+            "metric": metric
+        }
 
     model = KNeighborsClassifier(**params)
     return model

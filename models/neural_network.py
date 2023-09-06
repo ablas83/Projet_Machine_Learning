@@ -28,7 +28,12 @@ def nn_param_selector():
         max_iter = st.sidebar.number_input("max_iter", 100, 2000, step=50, value=100)
 
 
-        params = {"hidden_layer_sizes" : hidden_layer_sizes, "activation" : activation, "solver" : solver, "max_iter" : max_iter}
+        params = {
+            "hidden_layer_sizes" : hidden_layer_sizes,
+            "activation" : activation,
+            "solver" : solver,
+            "max_iter" : max_iter
+        }
 
     model = MLPClassifier(**params)
     return model

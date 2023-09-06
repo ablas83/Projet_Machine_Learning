@@ -11,10 +11,22 @@ from models.regression_elastic_net import en_param_selector
 from models.svr import svr_param_selector
 
 def getAlgorims(df):
-    classification = {'DecisionTreeClassifier': dt_param_selector,'kneighbors classifier': knn_param_selector,
-                      'random forest classifie': rf_param_selector,'SVC': svc_param_selector, 'neural network': nn_param_selector, 'logistic regression': lor_param_selector,}
-    regression = {'linear regression': lir_param_selector,'regression ridge': rd_param_selector, 'regression lasso' : rl_param_selector, 'regression Elastic Net' : en_param_selector,
-                  'SVR': svr_param_selector}
+    classification = {
+        'DecisionTreeClassifier': dt_param_selector,
+        'kneighbors classifier': knn_param_selector,
+        'random forest classifie': rf_param_selector,
+        'SVC': svc_param_selector,
+        'neural network': nn_param_selector,
+        'logistic regression': lor_param_selector,
+    }
+    regression = {
+        'linear regression': lir_param_selector,
+        'regression ridge': rd_param_selector,
+        'regression lasso' : rl_param_selector,
+        'regression Elastic Net' : en_param_selector,
+        'SVR': svr_param_selector
+    }
+    
     column_type = df['target'].dtype
     if column_type == 'object':
         return classification
