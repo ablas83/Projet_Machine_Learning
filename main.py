@@ -42,7 +42,8 @@ def header():
 
 def sidebar():
     st.sidebar.selectbox('please select your dataset', options= ['Diabet inde','Vin'], key ='data_sb', on_change=changeData)
-    st.sidebar.file_uploader("Choose a file", type=['csv'], key='uploaded_file',on_change= load)
+    st.sidebar.file_uploader("Choose a file", type=['csv'], key='uploaded_file',on_change= load,
+                             help= 'Choisir un CSV ayant target comme dernière colonne et point-virgule comme séparation')
     
     
 
@@ -81,7 +82,7 @@ if __name__ == '__main__':
 
         st.sidebar.selectbox('please select your algorithm', options= algorithms.keys(), key ='algo', on_change=changeAlgo)
         st.sidebar.toggle('Modifier les Hyperparamètres', key='on')
-        st.sidebar.toggle('Hyperparamètres optimals', key='optimal')
+        st.sidebar.toggle('Hyperparamètres optimaux', key='optimal')
         model = algorithms[st.session_state['algo']]()
         preprocessor = preprocessing.DataPreprocessor(df)
         X_train, X_test, y_train, y_test,X,y = preprocessor.preprocess_data()
@@ -129,10 +130,16 @@ if __name__ == '__main__':
                 y_pred = clf.predict(X_test)
 
                 cm, acc,f1 = train_test(y_pred, y_test,algorithms)
-                with st.expander("Evaluation du modéle"):
+                with st.expander("Evaluation du modèle"):
+                    st.text('',help = 'Calcule les vrai positifs (haut-gauche), vrai négatifs (bas-droite), faux positifs (bas-gauche), faux négatifs (haut-droite)')
                     st.pyplot(pt.conf_matrix(y_test,y_pred))
-                    st.pyplot(pt.courbe_appr(model, X, y))
-                    st.pyplot(pt.roc_class(X_train, X_test, y_train, y_test))
+                    st.text("",help = "Représente la performance au fur et à mesure de l'apprentissage. Underfitting : convergence vers une faible performance. Optimal : convergence vers une haute performance. Overfitting : courbe d'entraînement continue à s'améliorer tandis que la courbe de validation stagne ou commence à se dégrader")
+                    st.text('test', help= 'test').pyplot(pt.courbe_appr(model, X, y))
+                    try:
+                        st.text("", help="Evalue la capacité d'un modèle à discriminer entre les classes positives et négatives. Modèle parfait : courbe qui s'élève rapidement vers le coin supérieur gauche, ce qui signifie un TP rate élevé et un FP rate bas à un seuil faible.")
+                        st.pyplot(pt.roc_class(clf, X_test, y_test))
+                    except AttributeError as e:
+                        st.error(f"La courbe ROC ne convient pas au modèle SVC")
                 with st.expander("Metrics"):
                     jauge= go.Indicator(
                         mode="gauge+number+delta",
@@ -206,10 +213,12 @@ if __name__ == '__main__':
                 y_pred = clf.predict(X_test)
                 mse, r2 = train_test(y_pred, y_test,algorithms)
                 with st.expander("Evaluation du modéle"):
+                    st.text("",help = "Représente la performance au fur et à mesure de l'apprentissage. Underfitting : convergence vers une faible performance. Optimal : convergence vers une haute performance. Overfitting : courbe d'entraînement continue à s'améliorer tandis que la courbe de validation stagne ou commence à se dégrader")
                     st.pyplot(pt.courbe_appr(model, X, y))
+                    st.text("", help = "Permet de comparer visuellement la distribution des données réelles à une distribution théorique, avec une ligne droite indiquant une bonne correspondance.")
                     st.pyplot(pt.quant_quant(y_test, y_pred))
+                    st.text('', help="Examine la répartition des résidus. Idéalement, les résidus devraient suivre une distribution normale centrée sur zéro. Si l'histogramme présente une forme proche d'une courbe en cloche centrée sur zéro, cela indique que le modèle de régression capture correctement la variabilité des données.")
                     st.plotly_chart(pt.histo_residu(y_test, y_pred))
-                    st.pyplot(pt.digramme_dispersion(y_test, y_pred))
                 with st.expander("Metrics"):
                     jauge= go.Indicator(
                         mode="gauge+number+delta",

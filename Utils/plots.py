@@ -65,8 +65,8 @@ def courbe_appr(model, X, y):
     plt.xlabel('Taille de l\'ensemble d\'entraînement')
     plt.ylabel('Erreur quadratique moyenne')
 
-    plt.plot(train_sizes, train_scores_mean, label='Score d\'entraînement', color='blue', marker='o')
-    plt.plot(train_sizes, test_scores_mean, label='Score de validation', color='red', marker='o')
+    plt.plot(train_sizes, train_scores_mean, label='Courbe d\'entraînement', color='blue', marker='o')
+    plt.plot(train_sizes, test_scores_mean, label='Courbe de validation', color='red', marker='o')
 
     plt.legend(loc='best')
     plt.grid(True)
@@ -99,19 +99,23 @@ def conf_matrix(y_train, y_pred):
 
     # Créez un graphique de la matrice de confusion
     plt.figure(figsize=(6, 6))
-    sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', cbar=False, square=True)
+    
+    sns.heatmap(conf_matrix,
+                annot=True,
+                fmt='d',
+                cmap='Blues',
+                cbar=False,
+                square=True)
+    
     plt.xlabel('Valeurs Prédites')
     plt.ylabel('Valeurs Réelles')
     plt.title('Matrice de Confusion')
     plt.show()
 
 
-def roc_class(X_train, X_test, y_train, y_test):
+def roc_class(clf, X_test, y_test):
 
-    clf_tree = DecisionTreeClassifier()
-    clf_tree.fit(X_train, y_train)
-
-    y_score1 = clf_tree.predict_proba(X_test)[:,1]
+    y_score1 = clf.predict_proba(X_test)[:,1]
 
     false_positive_rate1, true_positive_rate1, threshold1 = roc_curve(y_test, y_score1)
 
@@ -130,7 +134,6 @@ def roc_class(X_train, X_test, y_train, y_test):
 
 
 def disp_classes(X, y): # ne fonctionne pas, WIP
-
     # Réduisez les dimensions à 2D en utilisant l'analyse en composantes principales (PCA)
     pca = PCA(n_components=2)
     X_2d = pca.fit_transform(X)
@@ -140,12 +143,17 @@ def disp_classes(X, y): # ne fonctionne pas, WIP
     plt.figure(figsize=(8, 6))
     colors = ['blue', 'red']
     for i in range(2):
-        plt.scatter(X_2d[y == i, 0], X_2d[y == i, 1], color=colors[i], label=f'Classe {i}')
+        plt.scatter(X_2d[y == i, 0],
+                    X_2d[y == i, 1],
+                    color=colors[i],
+                    label=f'Classe {i}')
+        
     plt.xlabel('Composante Principale 1')
     plt.ylabel('Composante Principale 2')
     plt.legend()
     plt.title('Diagramme de Dispersion des Classes (2D)')
     plt.show()
+
 
 def courbe_prec_recall(y_true, y_scores):
     # Calculer la courbe de précision-rappel
@@ -164,11 +172,13 @@ def courbe_prec_recall(y_true, y_scores):
     plt.grid(True)
     plt.show()
 
+
 def distribution_target(df):
     plt.figure(figsize=(8, 6))
     sns.countplot(x='target', data=df)
     plt.title('Distribution de la variable cible')
     plt.show()
+
 
 def etude_correlation(data):
     data1 =data
