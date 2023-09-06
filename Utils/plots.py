@@ -65,8 +65,8 @@ def courbe_appr(model, X, y):
     plt.xlabel('Taille de l\'ensemble d\'entraînement')
     plt.ylabel('Erreur quadratique moyenne')
 
-    plt.plot(train_sizes, train_scores_mean, label='Score d\'entraînement', color='blue', marker='o')
-    plt.plot(train_sizes, test_scores_mean, label='Score de validation', color='red', marker='o')
+    plt.plot(train_sizes, train_scores_mean, label='Courbe d\'entraînement', color='blue', marker='o')
+    plt.plot(train_sizes, test_scores_mean, label='Courbe de validation', color='red', marker='o')
 
     plt.legend(loc='best')
     plt.grid(True)
@@ -106,12 +106,9 @@ def conf_matrix(y_train, y_pred):
     plt.show()
 
 
-def roc_class(X_train, X_test, y_train, y_test):
+def roc_class(clf, X_test, y_test):
 
-    clf_tree = DecisionTreeClassifier()
-    clf_tree.fit(X_train, y_train)
-
-    y_score1 = clf_tree.predict_proba(X_test)[:,1]
+    y_score1 = clf.predict_proba(X_test)[:,1]
 
     false_positive_rate1, true_positive_rate1, threshold1 = roc_curve(y_test, y_score1)
 
