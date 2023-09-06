@@ -1,4 +1,3 @@
-import numpy as np
 import streamlit as st
 from sklearn.svm import SVR
 from sklearn.model_selection import GridSearchCV

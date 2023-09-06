@@ -1,10 +1,11 @@
 import pandas as pd
-import numpy as np
-from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.ensemble import IsolationForest
 from sklearn.model_selection import train_test_split
 from sklearn import set_config
+
+
 set_config(transform_output="pandas")
 
 
@@ -17,8 +18,8 @@ class DataPreprocessor:
         self.X_test = None
         self.y_train = None
         self.y_test = None
-    
-    def missing_values(self, strategy='median', threshold=0.4):
+
+    def missing_values(self, strategy="median", threshold=0.4):
         for column in self.df.columns:
             # Calcul du pourcentage de valeurs manquantes dans la colonne
             missing_percentage = self.df[column].isnull().mean()
@@ -28,22 +29,22 @@ class DataPreprocessor:
                 self.df.drop(columns=[column], inplace=True)
             else:
                 # Si le seuil n'est pas dépassé, vérifiez le type de données de la colonne
-                if self.df[column].dtype == 'float':
+                if self.df[column].dtype == "float":
                     # Imputez les valeurs manquantes avec la médiane pour les données numériques
                     imputer = SimpleImputer(strategy=strategy)
                     self.df[column] = imputer.fit_transform(self.df[[column]])
-                elif self.df[column].dtype == 'int':
+                elif self.df[column].dtype == "int":
                     # Imputez les valeurs manquantes avec la médiane pour les données numériques
                     imputer = SimpleImputer(strategy=strategy)
                     self.df[column] = imputer.fit_transform(self.df[[column]])
-                elif self.df[column].dtype == 'object':
+                elif self.df[column].dtype == "object":
                     # Imputez les valeurs manquantes avec une stratégie appropriée pour les données catégorielles (par exemple, classe majoritaire)
                     self.df[column].fillna(self.df[column].mode().iloc[0], inplace=True)
-    
+
         return self.df
-    
+
     def drop_id(self):
-        self.df = self.df.drop("id",axis=1)
+        self.df = self.df.drop("id", axis=1)
         self.df = self.df.reset_index(drop=True)
         return self.df
 
@@ -63,15 +64,17 @@ class DataPreprocessor:
 
     def standardisation(self):
         scaler = StandardScaler()
-        self.y = self.df['target']
-        self.df = scaler.fit_transform(self.df.drop('target', axis=1))
+        self.y = self.df["target"]
+        self.df = scaler.fit_transform(self.df.drop("target", axis=1))
         return self.df
-         
+
     def split_data(self):
         self.X = self.df
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size = 0.3,random_state = 42)
-        return (self.X_train, self.X_test, self.y_train, self.y_test,self.X,self.y)
-    
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
+            self.X, self.y, test_size=0.3, random_state=42
+        )
+        return (self.X_train, self.X_test, self.y_train, self.y_test, self.X, self.y)
+
     def preprocess_data(self):
         self.missing_values()
         self.drop_id()

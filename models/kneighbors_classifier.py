@@ -2,6 +2,7 @@ import streamlit as st
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import GridSearchCV
 
+
 def knn_param_selector():
     params = {}
     if st.session_state['on'] :

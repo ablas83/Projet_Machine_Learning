@@ -3,11 +3,12 @@ import streamlit as st
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV
 
+
 def lor_param_selector():
     params = {}
-    if st.session_state['on'] :
+    if st.session_state["on"]:
         solver = st.sidebar.selectbox(
-        "solver", options=["lbfgs", "newton-cg", "liblinear", "sag", "saga"]
+            "solver", options=["lbfgs", "newton-cg", "liblinear", "sag", "saga"]
         )
 
         if solver in ["newton-cg", "lbfgs", "sag"]:
@@ -25,12 +26,10 @@ def lor_param_selector():
         max_iter = st.sidebar.number_input("max_iter", 100, 2000, step=50, value=100)
 
         params = {"solver": solver, "penalty": penalty, "C": C, "max_iter": max_iter}
-    if st.session_state['optimal'] :
-        parameters = [{'penalty':['l1','l2']}, 
-              {'C':[1, 10, 100, 1000]}]
+    if st.session_state["optimal"]:
+        parameters = [{"penalty": ["l1", "l2"]}, {"C": [1, 10, 100, 1000]}]
         grid = GridSearchCV(LogisticRegression(), parameters, cv=5)
         return grid
     else:
         model = LogisticRegression(**params)
         return model
-    

@@ -2,6 +2,8 @@ import streamlit as st
 from sklearn.neural_network import MLPClassifier
 import numpy as np
 from sklearn.model_selection import GridSearchCV
+
+
 def nn_param_selector():
     params = {}
     if st.session_state['on'] :
