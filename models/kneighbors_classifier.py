@@ -1,6 +1,6 @@
 import streamlit as st
 from sklearn.neighbors import KNeighborsClassifier
-
+from sklearn.model_selection import GridSearchCV
 
 def knn_param_selector():
     params = {}
@@ -11,6 +11,12 @@ def knn_param_selector():
         )
 
         params = {"n_neighbors": n_neighbors, "metric": metric}
-
-    model = KNeighborsClassifier(**params)
-    return model
+    metric = ["minkowski", "euclidean", "manhattan", "chebyshev", "mahalanobis"]
+    k_range = list(range(1, 31))
+    param_grid = dict(n_neighbors=k_range, metric=metric)
+    if st.session_state['optimal'] :
+        grid = GridSearchCV(KNeighborsClassifier(), param_grid, cv=10)
+        return grid
+    else:
+        model = KNeighborsClassifier(**params)
+        return model

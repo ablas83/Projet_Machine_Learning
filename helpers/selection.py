@@ -10,6 +10,7 @@ from models.regression_lasso import rl_param_selector
 from models.regression_elastic_net import en_param_selector
 from models.svr import svr_param_selector
 
+
 def getAlgorims(df):
     classification = {'DecisionTreeClassifier': dt_param_selector,'kneighbors classifier': knn_param_selector,
                       'random forest classifie': rf_param_selector,'SVC': svc_param_selector, 'neural network': nn_param_selector, 'logistic regression': lor_param_selector,}
@@ -20,3 +21,4 @@ def getAlgorims(df):
         return classification
     else:
         return regression
+
