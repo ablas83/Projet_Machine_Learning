@@ -96,7 +96,11 @@ if __name__ == '__main__':
                 with st.expander("Evaluation du modéle"):
                     st.pyplot(pt.conf_matrix(y_test,y_pred))
                     st.pyplot(pt.courbe_appr(best_model,X, y))
-                    st.pyplot(pt.roc_class(X_train, X_test, y_train, y_test))
+                    try:
+                        st.text("", help="Evalue la capacité d'un modèle à discriminer entre les classes positives et négatives. Modèle parfait : courbe qui s'élève rapidement vers le coin supérieur gauche, ce qui signifie un TP rate élevé et un FP rate bas à un seuil faible.")
+                        st.pyplot(pt.roc_class(best_model, X_test, y_test))
+                    except AttributeError as e:
+                        st.error(f"La courbe ROC ne convient pas au modèle SVC")
                 with st.expander("Metrics"):
                     jauge= go.Indicator(
                         mode="gauge+number+delta",
@@ -176,10 +180,12 @@ if __name__ == '__main__':
                 mse, r2 = train_test(y_pred, y_test,algorithms)
                 best_params_df = pd.DataFrame(clf.best_params_, index=['Valeur'])
                 with st.expander("Evaluation du modéle"):
+                    st.text("",help = "Représente la performance au fur et à mesure de l'apprentissage. Underfitting : convergence vers une faible performance. Optimal : convergence vers une haute performance. Overfitting : courbe d'entraînement continue à s'améliorer tandis que la courbe de validation stagne ou commence à se dégrader")
                     st.pyplot(pt.courbe_appr(best_model, X, y))
+                    st.text("", help = "Permet de comparer visuellement la distribution des données réelles à une distribution théorique, avec une ligne droite indiquant une bonne correspondance.")
                     st.pyplot(pt.quant_quant(y_test, y_pred))
+                    st.text('', help="Examine la répartition des résidus. Idéalement, les résidus devraient suivre une distribution normale centrée sur zéro. Si l'histogramme présente une forme proche d'une courbe en cloche centrée sur zéro, cela indique que le modèle de régression capture correctement la variabilité des données.")
                     st.plotly_chart(pt.histo_residu(y_test, y_pred))
-                    st.pyplot(pt.digramme_dispersion(y_test, y_pred))
                 with st.expander("Metrics"):
                     jauge= go.Indicator(
                         mode="gauge+number+delta",
