@@ -1,7 +1,7 @@
 import streamlit as st
 from Utils.bdd import connection_database, get_data_to_df
 from helpers.selection import getAlgorims
-from Utils.train_test import train_test
+from Utils.metrics import train_test
 import preprocessing
 import Utils.plots as pt
 import pandas as pd
