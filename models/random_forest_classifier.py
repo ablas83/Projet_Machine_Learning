@@ -1,6 +1,6 @@
 import streamlit as st
 from sklearn.ensemble import RandomForestClassifier
-
+from sklearn.model_selection import GridSearchCV
 
 def rf_param_selector():
     params = {}
@@ -19,6 +19,15 @@ def rf_param_selector():
         "max_features": max_features,
         "n_jobs": -1,
         }
-
-    model = RandomForestClassifier(**params)
-    return model
+    if st.session_state['optimal'] :
+        param_grid = { 
+                'n_estimators': [200, 500],
+                'max_features': ['auto', 'sqrt', 'log2'],
+                'max_depth' : [4,5,6,7,8],
+                'criterion' :['gini', 'entropy']
+                }
+        grid = GridSearchCV(RandomForestClassifier(), param_grid, cv=5)
+        return grid
+    else:
+        model = RandomForestClassifier(**params)
+        return model
